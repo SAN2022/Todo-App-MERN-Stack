@@ -14,11 +14,11 @@ export default function Todo() {
 
     const apiUrl = "https://todo-app-server-five-lovat.vercel.app"
     
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setError("")
         //check inputs
         if (title.trim() !== '' && description.trim() !== '') {
-            fetch(apiUrl+"/todos", {
+           await fetch( apiUrl+"/todos", {
                 method: "POST",
                 headers: {
                     'Content-Type':'application/json'
@@ -49,8 +49,8 @@ export default function Todo() {
         getItems()
     }, [])
 
-    const getItems = () => {
-        fetch(apiUrl+"/todos")
+    const getItems = async () => {
+        await fetch(apiUrl+"/todos")
         .then((res) => res.json())
         .then((res) => {
             setTodos(res)
@@ -63,11 +63,11 @@ export default function Todo() {
         setEditDescription(item.description)
     }
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         setError("")
         //check inputs
         if (editTitle.trim() !== '' && editDescription.trim() !== '') {
-            fetch(apiUrl+"/todos/"+editId, {
+            await fetch(apiUrl+"/todos/"+editId, {
                 method: "PUT",
                 headers: {
                     'Content-Type':'application/json'
@@ -106,9 +106,9 @@ export default function Todo() {
         setEditId(-1)
     }
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure want to delete?')) {
-            fetch(apiUrl+'/todos/'+id, {
+            await fetch(apiUrl+'/todos/'+id, {
                 method: "DELETE"
             })
             .then(() => {
