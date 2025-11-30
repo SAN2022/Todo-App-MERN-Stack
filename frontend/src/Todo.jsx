@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 export default function Todo() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [todos, setTodos] = useState([]);
     const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
     const [editId, setEditId] = useState(-1);
 
     // Edit
@@ -31,18 +32,29 @@ export default function Todo() {
                     setTodos([...todos, {title, description}])
                     setTitle("");
                     setDescription("");
-                    setMessage("Item added successfully")
-                    setTimeout(() => {
-                        setMessage("");
-                    },3000)
+                    toast.success("Item added successfully!", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
     
                 }else {
                     //set error
-                    setError("Unable to create Todo item")
+                    toast.error("Unable to create Todo item", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
                 }
             }).catch(() => {
-                setError("Unable to create Todo item")
+                toast.error("Unable to create Todo item", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
             })
+        } else {
+            toast.warning("Please fill in both title and description", {
+                position: "top-right",
+                autoClose: 3000,
+            });
         }
     }
 
@@ -55,6 +67,12 @@ export default function Todo() {
         .then((res) => res.json())
         .then((res) => {
             setTodos(res)
+        })
+        .catch(() => {
+            toast.error("Failed to fetch todos", {
+                position: "top-right",
+                autoClose: 3000,
+            });
         })
     }
 
@@ -86,25 +104,40 @@ export default function Todo() {
                     })
 
                     setTodos(updatedTodos)
-                    setMessage("Item updated successfully")
-                    setTimeout(() => {
-                        setMessage("");
-                    },3000)
+                    toast.success("Item updated successfully!", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
 
                     setEditId(-1)
     
                 }else {
                     //set error
-                    setError("Unable to create Todo item")
+                    toast.error("Unable to update Todo item", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
                 }
             }).catch(() => {
-                setError("Unable to create Todo item")
+                toast.error("Unable to update Todo item", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
             })
+        } else {
+            toast.warning("Please fill in both title and description", {
+                position: "top-right",
+                autoClose: 3000,
+            });
         }
     }
 
     const handleEditCancel = () => {
         setEditId(-1)
+        toast.info("Edit cancelled", {
+            position: "top-right",
+            autoClose: 2000,
+        });
     }
 
     const handleDelete = async (id) => {
@@ -112,20 +145,37 @@ export default function Todo() {
             await fetch(apiUrl+'/todos/'+id, {
                 method: "DELETE"
             })
-            .then(() => {
-               const updatedTodos = todos.filter((item) => item._id !== id)
-               setTodos(updatedTodos)
+            .then((res) => {
+                if (res.ok) {
+                    const updatedTodos = todos.filter((item) => item._id !== id)
+                    setTodos(updatedTodos)
+                    toast.success("Item deleted successfully!", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
+                } else {
+                    toast.error("Unable to delete Todo item", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
+                }
+            })
+            .catch(() => {
+                toast.error("Unable to delete Todo item", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
             })
         }
     }
 
     return <>
+        <ToastContainer />
         <div className="row p-3 bg-success text-light">
             <h1>ToDo Project with MERN stack</h1>
         </div>
         <div className="row">
             <h3>Add Item</h3>
-            {message && <p className="text-success">{message}</p>}
             <div className="form-group d-flex gap-2">
                 <input placeholder="Title" onChange={(e) => setTitle(e.target.value)} value={title} className="form-control" type="text" />
                 <input placeholder="Description" onChange={(e) => setDescription(e.target.value)} value={description} className="form-control" type="text" />
